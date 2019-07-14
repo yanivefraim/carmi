@@ -1276,14 +1276,14 @@ function topLevel() {
   function $$FUNCNAMEBuild($tracked) {
     /* PRETRACKING */
     /* TYPE_CHECK */
-    const newValue = $EXPR;
+    var newValue = $EXPR;
     /* TRACKING */
     return newValue
   }
 }
 
 function object() {
-  const $FUNCNAMEArgs = [
+  var $FUNCNAMEArgs = [
     /*ARGS*/
   ];
 }
@@ -1295,7 +1295,7 @@ function array() {
 function func() {
   function $FUNCNAME($tracked, key, val, context) {
     /* PRETRACKING */
-    const res = $EXPR1;
+    var res = $EXPR1;
     /* TRACKING */
     return res;
   }
@@ -1304,7 +1304,7 @@ function func() {
 function recursiveFunc() {
   function $FUNCNAME($tracked, key, val, context, loop) {
     /* PRETRACKING */
-    const res = $EXPR1;
+    var res = $EXPR1;
     /* TRACKING */
     return res;
   }
@@ -1313,21 +1313,21 @@ function recursiveFunc() {
 function helperFunc() {
   function $ROOTNAME($tracked$FN_ARGS) {
     /* PRETRACKING */
-    const res = $EXPR1;
+    var res = $EXPR1;
     /* TRACKING */
     return res;
   }
 }
 
-const base = require('./naive').base;
+var base = require('./naive').base;
 
 function updateDerived() {
-  const builderFunctions = [/*BUILDER_FUNCS*/];
-  const builderNames = [/*BUILDER_NAMES*/];
+  var builderFunctions = [/*BUILDER_FUNCS*/];
+  var builderNames = [/*BUILDER_NAMES*/];
   function updateDerived() {
     for (let i = 0; i < $COUNT_GETTERS; i++) {
       if ($first || $invalidatedRoots.has(i)) {
-        const newValue = builderFunctions[i]([$invalidatedRoots, i]);
+        var newValue = builderFunctions[i]([$invalidatedRoots, i]);
         setOnArray($topLevel, i, newValue, $first);
         if (!$first) {
           $invalidatedRoots.delete(i);
