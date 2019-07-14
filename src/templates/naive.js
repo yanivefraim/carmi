@@ -1,10 +1,10 @@
 function base() {
   function $NAME($model, $funcLibRaw, $batchingStrategy) {
-    let $funcLib = $funcLibRaw
+    var $funcLib = $funcLibRaw
 
     if ($DEBUG_MODE) {
     $funcLib = (!$funcLibRaw || typeof Proxy === 'undefined') ? $funcLibRaw : new Proxy($funcLibRaw, {
-      get: (target, functionName) => {
+      get: function(target, functionName) {
         if (target[functionName]) {
           return target[functionName]
         }
@@ -14,8 +14,8 @@ function base() {
   }
 
   function mathFunction(name, source) {
-    return arg => {
-      const type = typeof arg
+    return function(arg) {
+      var type = typeof arg
       if (type !== 'number') {
         throw new TypeError(`Trying to call ${JSON.stringify(arg)}.${name}. Expects number, received ${type} at ${source}`)
       }
@@ -26,7 +26,7 @@ function base() {
 
   function checkTypes(input, name, types, functionName, source) {
     function checkType(type) {
-      const isArray = Array.isArray(input)
+      var isArray = Array.isArray(input)
       return type == 'array' && isArray || (type === typeof input && !isArray)
     }
 
@@ -34,18 +34,18 @@ function base() {
       return
     }
 
-    const asString = typeof input === 'object' ? JSON.stringify(input) : input
+    var asString = typeof input === 'object' ? JSON.stringify(input) : input
 
     throw new TypeError(`${functionName} expects ${types.join('/')}. ${name} at ${source}: ${asString}.${functionName}`)
   }
 
-  const $res = { $model };
-    const $listeners = new Set();
+  var $res = { $model };
+    var $listeners = new Set();
     /* LIBRARY */
     /* ALL_EXPRESSIONS */
-    let $inBatch = false;
-    let $batchPending = [];
-    let $inRecalculate = false;
+    var $inBatch = false;
+    var $batchPending = [];
+    var $inRecalculate = false;
 
     function recalculate() {
       if ($inBatch) {
@@ -54,7 +54,7 @@ function base() {
       $inRecalculate = true;
       /* DERIVED */
       /* RESET */
-      $listeners.forEach(callback => callback());
+      $listeners.forEach(function(callback) {return callback();});
       $inRecalculate = false;
       if ($batchPending.length) {
         $res.$endBatch();
@@ -70,23 +70,23 @@ function base() {
         ensurePath(path.slice(0, path.length - 1))
       }
 
-      const lastObjectKey = path[path.length - 2]
+      var lastObjectKey = path[path.length - 2]
 
-      const assignable = getAssignableObject(path, path.length - 2)
+      var assignable = getAssignableObject(path, path.length - 2)
       if (assignable[lastObjectKey]) {
         return
       }
-      const lastType = typeof path[path.length - 1]
+      var lastType = typeof path[path.length - 1]
       assignable[lastObjectKey] = lastType === 'number' ? [] : {}
     }
 
     function getAssignableObject(path, index) {
-      return path.slice(0, index).reduce((agg, p) => agg[p], $model)
+      return path.slice(0, index).reduce(function(agg, p) {return agg[p];}, $model)
     }
 
     function push(path, value) {
       ensurePath([...path, 0])
-      const arr = getAssignableObject(path, path.length)
+      var arr = getAssignableObject(path, path.length)
       splice([...path, arr.length], 0, value)
     }
 
@@ -115,31 +115,31 @@ function base() {
       $res,
       {$SETTERS},
       {
-        $startBatch: () => {
+        $startBatch: function() {
           $inBatch = true;
         },
-        $endBatch: () => {
+        $endBatch: function() {
           $inBatch = false;
           if ($batchPending.length) {
-            $batchPending.forEach(({ func, args }) => {
+            $batchPending.forEach(function ({ func, args }) {
               func.apply($res, args);
             });
             $batchPending = [];
             recalculate();
           }
         },
-        $runInBatch: func => {
+        $runInBatch: function(func) {
           $res.$startBatch();
           func();
           $res.$endBatch();
         },
-        $addListener: func => {
+        $addListener: function(func) {
           $listeners.add(func);
         },
-        $removeListener: func => {
+        $removeListener: function(func) {
           $listeners.delete(func);
         },
-        $setBatchingStrategy: func => {
+        $setBatchingStrategy: function(func) {
           $batchingStrategy = func;
         }
       }
@@ -147,8 +147,8 @@ function base() {
 
     if ($DEBUG_MODE) {
       Object.assign($res, {
-        $ast: () => { return $AST },
-        $source: () => null
+        $ast: function() { return $AST },
+        $source: function() { return null }
       })
     }
     recalculate();
@@ -188,14 +188,14 @@ function recursiveMapValues() {
 
 function library() {
   function mapValues(func, src, context) {
-    return Object.keys(src).reduce((acc, key) => {
+    return Object.keys(src).reduce(function(acc, key) {
       acc[key] = func(src[key], key, context);
       return acc;
     }, {});
   }
 
   function filterBy(func, src, context) {
-    return Object.keys(src).reduce((acc, key) => {
+    return Object.keys(src).reduce(function(acc, key) {
       if (func(src[key], key, context)) {
         acc[key] = src[key];
       }
@@ -207,8 +207,8 @@ function library() {
     if (Array.isArray(src)) {
       throw new Error('groupBy only works on objects');
     }
-    return Object.keys(src).reduce((acc, key) => {
-      const newKey = func(src[key], key, context);
+    return Object.keys(src).reduce(function (acc, key) {
+      var newKey = func(src[key], key, context);
       acc[newKey] = acc[newKey] || {};
       acc[newKey][key] = src[key];
       return acc;
@@ -216,31 +216,31 @@ function library() {
   }
 
   function mapKeys(func, src, context) {
-    return Object.keys(src).reduce((acc, key) => {
-      const newKey = func(src[key], key, context);
+    return Object.keys(src).reduce(function(acc, key) {
+      var newKey = func(src[key], key, context);
       acc[newKey] = src[key];
       return acc;
     }, {});
   }
 
   function map(func, src, context) {
-    return src.map((val, key) => func(val, key, context));
+    return src.map(function (val, key) { return func(val, key, context);});
   }
 
   function any(func, src, context) {
-    return src.some((val, key) => func(val, key, context));
+    return src.some(function (val, key) { return func(val, key, context);});
   }
 
   function filter(func, src, context) {
-    return src.filter((val, key) => func(val, key, context));
+    return src.filter(function (val, key) { return func(val, key, context);});
   }
 
   function anyValues(func, src, context) {
-    return Object.keys(src).some(key => func(src[key], key, context));
+    return Object.keys(src).some(function(key) { return func(src[key], key, context);});
   }
 
   function keyBy(func, src, context) {
-    return src.reduce((acc, val, key) => {
+    return src.reduce(function (acc, val, key) {
       acc[func(val, key, context)] = val;
       return acc;
     }, {});
@@ -263,8 +263,8 @@ function library() {
   }
 
   function range(end, start = 0, step = 1) {
-    const res = [];
-    for (let val = start; (step > 0 && val < end) || (step < 0 && val > end); val += step) {
+    var res = [];
+    for (var val = start; (step > 0 && val < end) || (step < 0 && val > end); val += step) {
       res.push(val);
     }
     return res;
@@ -283,7 +283,7 @@ function library() {
   }
 
   function sum(src) {
-    return src.reduce((sum, val) => sum + val, 0)
+    return src.reduce(function (sum, val) { return sum + val;}, 0)
   }
 
   function flatten(src) {
@@ -291,19 +291,19 @@ function library() {
   }
 
   function recursiveMap(func, src, context) {
-    const res = [];
-    const resolved = src.map(x => false);
-    src.forEach((val, key) => {
+    var res = [];
+    var resolved = src.map(function(x) { return false;});
+    src.forEach(function(val, key) {
       loopFunction(resolved, res, func, src, context, key);
     });
     return res;
   }
 
   function recursiveMapValues(func, src, context) {
-    const res = {};
-    const resolved = {};
-    Object.keys(src).forEach(key => (resolved[key] = false));
-    Object.keys(src).forEach(key => {
+    var res = {};
+    var resolved = {};
+    Object.keys(src).forEach(function(key) { return (resolved[key] = false);});
+    Object.keys(src).forEach(function(key) {
       loopFunction(resolved, res, func, src, context, key);
     });
     return res;
@@ -316,9 +316,9 @@ function library() {
 
   function splice(pathWithKey, len, ...newItems) {
     ensurePath(pathWithKey)
-    const key = pathWithKey[pathWithKey.length - 1]
-    const path = pathWithKey.slice(0, pathWithKey.length - 1)
-    const arr = getAssignableObject(path, path.length)
+    var key = pathWithKey[pathWithKey.length - 1]
+    var path = pathWithKey.slice(0, pathWithKey.length - 1)
+    var arr = getAssignableObject(path, path.length)
     arr.splice(key, len, ...newItems)
   }
 }
