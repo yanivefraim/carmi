@@ -145,10 +145,10 @@ function base() {
     Object.assign($res, {
       $SETTERS
     }, {
-      $startBatch: function $startBatch() {
+      $startBatch: function () {
         $inBatch = true;
       },
-      $endBatch: function $endBatch() {
+      $endBatch: function () {
         $inBatch = false;
 
         if ($batchPending.length) {
@@ -161,28 +161,28 @@ function base() {
           recalculate();
         }
       },
-      $runInBatch: function $runInBatch(func) {
+      $runInBatch: function (func) {
         $res.$startBatch();
         func();
         $res.$endBatch();
       },
-      $addListener: function $addListener(func) {
+      $addListener: function (func) {
         $listeners.add(func);
       },
-      $removeListener: function $removeListener(func) {
+      $removeListener: function (func) {
         $listeners.delete(func);
       },
-      $setBatchingStrategy: function $setBatchingStrategy(func) {
+      $setBatchingStrategy: function (func) {
         $batchingStrategy = func;
       }
     });
 
     if ($DEBUG_MODE) {
       Object.assign($res, {
-        $ast: function $ast() {
+        $ast: function () {
           return $AST;
         },
-        $source: function $source() {
+        $source: function () {
           return null;
         }
       });
