@@ -1,61 +1,82 @@
 function base() {
+  function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+  function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+  function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+  function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+  function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
   function $NAME($model, $funcLibRaw, $batchingStrategy) {
-    let $funcLib = $funcLibRaw
+    var $funcLib = $funcLibRaw;
 
     if ($DEBUG_MODE) {
-    $funcLib = (!$funcLibRaw || typeof Proxy === 'undefined') ? $funcLibRaw : new Proxy($funcLibRaw, {
-      get: (target, functionName) => {
-        if (target[functionName]) {
-          return target[functionName]
+      $funcLib = !$funcLibRaw || typeof Proxy === 'undefined' ? $funcLibRaw : new Proxy($funcLibRaw, {
+        get: function (target, functionName) {
+          if (target[functionName]) {
+            return target[functionName];
+          }
+
+          throw new TypeError("Trying to call undefined function: ".concat(functionName, " "));
+        }
+      });
+    }
+
+    function mathFunction(name, source) {
+      return function (arg) {
+        var type = _typeof(arg);
+
+        if (type !== 'number') {
+          throw new TypeError("Trying to call ".concat(JSON.stringify(arg), ".").concat(name, ". Expects number, received ").concat(type, " at ").concat(source));
         }
 
-        throw new TypeError(`Trying to call undefined function: ${functionName} `)
-    }})
-  }
+        return Math[name](arg);
+      };
+    }
 
-  function mathFunction(name, source) {
-    return arg => {
-      const type = typeof arg
-      if (type !== 'number') {
-        throw new TypeError(`Trying to call ${JSON.stringify(arg)}.${name}. Expects number, received ${type} at ${source}`)
+    function checkTypes(input, name, types, functionName, source) {
+      function checkType(type) {
+        var isArray = Array.isArray(input);
+        return type == 'array' && isArray || type === _typeof(input) && !isArray;
       }
 
-      return Math[name](arg)
-    }
-  }
+      if (types.some(checkType)) {
+        return;
+      }
 
-  function checkTypes(input, name, types, functionName, source) {
-    function checkType(type) {
-      const isArray = Array.isArray(input)
-      return type == 'array' && isArray || (type === typeof input && !isArray)
+      var asString = _typeof(input) === 'object' ? JSON.stringify(input) : input;
+      throw new TypeError("".concat(functionName, " expects ").concat(types.join('/'), ". ").concat(name, " at ").concat(source, ": ").concat(asString, ".").concat(functionName));
     }
 
-    if (types.some(checkType)) {
-      return
-    }
-
-    const asString = typeof input === 'object' ? JSON.stringify(input) : input
-
-    throw new TypeError(`${functionName} expects ${types.join('/')}. ${name} at ${source}: ${asString}.${functionName}`)
-  }
-
-  const $res = { $model };
-    const $listeners = new Set();
+    var $res = {
+      $model
+    };
+    var $listeners = new Set();
     /* LIBRARY */
+
     /* ALL_EXPRESSIONS */
-    let $inBatch = false;
-    let $batchPending = [];
-    let $inRecalculate = false;
+
+    var $inBatch = false;
+    var $batchPending = [];
+    var $inRecalculate = false;
 
     function recalculate() {
       if ($inBatch) {
         return;
       }
+
       $inRecalculate = true;
       /* DERIVED */
+
       /* RESET */
-      $listeners.forEach(callback => callback());
+
+      $listeners.forEach(function (callback) {
+        return callback();
+      });
       $inRecalculate = false;
+
       if ($batchPending.length) {
         $res.$endBatch();
       }
@@ -63,45 +84,57 @@ function base() {
 
     function ensurePath(path) {
       if (path.length < 2) {
-        return
+        return;
       }
 
       if (path.length > 2) {
-        ensurePath(path.slice(0, path.length - 1))
+        ensurePath(path.slice(0, path.length - 1));
       }
 
-      const lastObjectKey = path[path.length - 2]
+      var lastObjectKey = path[path.length - 2];
+      var assignable = getAssignableObject(path, path.length - 2);
 
-      const assignable = getAssignableObject(path, path.length - 2)
       if (assignable[lastObjectKey]) {
-        return
+        return;
       }
-      const lastType = typeof path[path.length - 1]
-      assignable[lastObjectKey] = lastType === 'number' ? [] : {}
+
+      var lastType = _typeof(path[path.length - 1]);
+
+      assignable[lastObjectKey] = lastType === 'number' ? [] : {};
     }
 
     function getAssignableObject(path, index) {
-      return path.slice(0, index).reduce((agg, p) => agg[p], $model)
+      return path.slice(0, index).reduce(function (agg, p) {
+        return agg[p];
+      }, $model);
     }
 
     function push(path, value) {
-      ensurePath([...path, 0])
-      const arr = getAssignableObject(path, path.length)
-      splice([...path, arr.length], 0, value)
+      ensurePath([].concat(_toConsumableArray(path), [0]));
+      var arr = getAssignableObject(path, path.length);
+      splice([].concat(_toConsumableArray(path), [arr.length]), 0, value);
     }
 
     function applySetter(object, key, value) {
       if (typeof value === 'undefined') {
-        delete object[key]
+        delete object[key];
       } else {
         object[key] = value;
       }
     }
 
-    function $setter(func, ...args) {
+    function $setter(func) {
+      for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
+
       if ($inBatch || $inRecalculate || $batchingStrategy) {
-        $batchPending.push({ func, args });
-        if ((!$inBatch && !$inRecalculate) && $batchingStrategy) {
+        $batchPending.push({
+          func: func,
+          args: args
+        });
+
+        if (!$inBatch && !$inRecalculate && $batchingStrategy) {
           $inBatch = true;
           $batchingStrategy.call($res);
         }
@@ -115,42 +148,49 @@ function base() {
       $res,
       {$SETTERS},
       {
-        $startBatch: () => {
-          $inBatch = true;
-        },
-        $endBatch: () => {
-          $inBatch = false;
-          if ($batchPending.length) {
-            $batchPending.forEach(({ func, args }) => {
-              func.apply($res, args);
-            });
-            $batchPending = [];
-            recalculate();
-          }
-        },
-        $runInBatch: func => {
-          $res.$startBatch();
-          func();
-          $res.$endBatch();
-        },
-        $addListener: func => {
-          $listeners.add(func);
-        },
-        $removeListener: func => {
-          $listeners.delete(func);
-        },
-        $setBatchingStrategy: func => {
-          $batchingStrategy = func;
+        $startBatch: function () {
+        $inBatch = true;
+      },
+      $endBatch: function () {
+        $inBatch = false;
+
+        if ($batchPending.length) {
+          $batchPending.forEach(function (_ref) {
+            var func = _ref.func,
+                args = _ref.args;
+            func.apply($res, args);
+          });
+          $batchPending = [];
+          recalculate();
         }
+      },
+      $runInBatch: function (func) {
+        $res.$startBatch();
+        func();
+        $res.$endBatch();
+      },
+      $addListener: function (func) {
+        $listeners.add(func);
+      },
+      $removeListener: function (func) {
+        $listeners.delete(func);
+      },
+      $setBatchingStrategy: function (func) {
+        $batchingStrategy = func;
       }
-    );
+    });
 
     if ($DEBUG_MODE) {
       Object.assign($res, {
-        $ast: () => { return $AST },
-        $source: () => null
-      })
+        $ast: function () {
+          return $AST;
+        },
+        $source: function () {
+          return null;
+        }
+      });
     }
+
     recalculate();
     return $res;
   }
