@@ -108,7 +108,10 @@ function base() {
       }
     }
 
-    function $setter(func, ...args) {
+    function $setter(func) {
+      for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
       if ($inBatch || $inRecalculate || $batchingStrategy) {
         $batchPending.push({ func, args });
         if ((!$inBatch && !$inRecalculate) && $batchingStrategy) {
