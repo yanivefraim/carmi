@@ -85,9 +85,9 @@ function base() {
     }
 
     function push(path, value) {
-      ensurePath([...path, 0])
+      ensurePath(path.concat(0))
       var arr = getAssignableObject(path, path.length)
-      splice([...path, arr.length], 0, value)
+      splice(path.concat(arr.length), 0, value)
     }
 
     function applySetter(object, key, value) {
