@@ -193,18 +193,27 @@ function recursiveMapValues() {
 }
 
 function library() {
+  function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+  function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+  function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+  function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
   function mapValues(func, src, context) {
-    return Object.keys(src).reduce(function(acc, key) {
+    return Object.keys(src).reduce(function (acc, key) {
       acc[key] = func(src[key], key, context);
       return acc;
     }, {});
   }
 
   function filterBy(func, src, context) {
-    return Object.keys(src).reduce(function(acc, key) {
+    return Object.keys(src).reduce(function (acc, key) {
       if (func(src[key], key, context)) {
         acc[key] = src[key];
       }
+
       return acc;
     }, {});
   }
@@ -213,6 +222,7 @@ function library() {
     if (Array.isArray(src)) {
       throw new Error('groupBy only works on objects');
     }
+
     return Object.keys(src).reduce(function (acc, key) {
       var newKey = func(src[key], key, context);
       acc[newKey] = acc[newKey] || {};
@@ -222,7 +232,7 @@ function library() {
   }
 
   function mapKeys(func, src, context) {
-    return Object.keys(src).reduce(function(acc, key) {
+    return Object.keys(src).reduce(function (acc, key) {
       var newKey = func(src[key], key, context);
       acc[newKey] = src[key];
       return acc;
@@ -230,19 +240,27 @@ function library() {
   }
 
   function map(func, src, context) {
-    return src.map(function (val, key) { return func(val, key, context);});
+    return src.map(function (val, key) {
+      return func(val, key, context);
+    });
   }
 
   function any(func, src, context) {
-    return src.some(function (val, key) { return func(val, key, context);});
+    return src.some(function (val, key) {
+      return func(val, key, context);
+    });
   }
 
   function filter(func, src, context) {
-    return src.filter(function (val, key) { return func(val, key, context);});
+    return src.filter(function (val, key) {
+      return func(val, key, context);
+    });
   }
 
   function anyValues(func, src, context) {
-    return Object.keys(src).some(function(key) { return func(src[key], key, context);});
+    return Object.keys(src).some(function (key) {
+      return func(src[key], key, context);
+    });
   }
 
   function keyBy(func, src, context) {
@@ -261,23 +279,27 @@ function library() {
   }
 
   function assign(src) {
-    return Object.assign({}, ...src);
+    return Object.assign.apply(Object, [{}].concat(_toConsumableArray(src)));
   }
 
   function size(src) {
     return Array.isArray(src) ? src.length : Object.keys(src).length;
   }
 
-  function range(end, start = 0, step = 1) {
+  function range(end) {
+    var start = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var step = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
     var res = [];
-    for (var val = start; (step > 0 && val < end) || (step < 0 && val > end); val += step) {
+
+    for (var val = start; step > 0 && val < end || step < 0 && val > end; val += step) {
       res.push(val);
     }
+
     return res;
   }
 
   function defaults(src) {
-    return Object.assign({}, ...[...src].reverse());
+    return Object.assign.apply(Object, [{}].concat(_toConsumableArray(_toConsumableArray(src).reverse())));
   }
 
   function loopFunction(resolved, res, func, src, context, key) {
@@ -285,21 +307,28 @@ function library() {
       resolved[key] = true;
       res[key] = func(src[key], key, context, loopFunction.bind(null, resolved, res, func, src, context));
     }
+
     return res[key];
   }
 
   function sum(src) {
-    return src.reduce(function (sum, val) { return sum + val;}, 0)
+    return src.reduce(function (sum, val) {
+      return sum + val;
+    }, 0);
   }
 
   function flatten(src) {
-    return [].concat(...src)
+    var _ref;
+
+    return (_ref = []).concat.apply(_ref, _toConsumableArray(src));
   }
 
   function recursiveMap(func, src, context) {
     var res = [];
-    var resolved = src.map(function(x) { return false;});
-    src.forEach(function(val, key) {
+    var resolved = src.map(function (x) {
+      return false;
+    });
+    src.forEach(function (val, key) {
       loopFunction(resolved, res, func, src, context, key);
     });
     return res;
@@ -308,24 +337,31 @@ function library() {
   function recursiveMapValues(func, src, context) {
     var res = {};
     var resolved = {};
-    Object.keys(src).forEach(function(key) { return (resolved[key] = false);});
-    Object.keys(src).forEach(function(key) {
+    Object.keys(src).forEach(function (key) {
+      return resolved[key] = false;
+    });
+    Object.keys(src).forEach(function (key) {
       loopFunction(resolved, res, func, src, context, key);
     });
     return res;
   }
 
   function set(path, value) {
-    ensurePath(path)
-    applySetter(getAssignableObject(path, path.length - 1), path[path.length - 1], value)
+    ensurePath(path);
+    applySetter(getAssignableObject(path, path.length - 1), path[path.length - 1], value);
   }
 
-  function splice(pathWithKey, len, ...newItems) {
-    ensurePath(pathWithKey)
-    var key = pathWithKey[pathWithKey.length - 1]
-    var path = pathWithKey.slice(0, pathWithKey.length - 1)
-    var arr = getAssignableObject(path, path.length)
-    arr.splice(key, len, ...newItems)
+  function splice(pathWithKey, len) {
+    ensurePath(pathWithKey);
+    var key = pathWithKey[pathWithKey.length - 1];
+    var path = pathWithKey.slice(0, pathWithKey.length - 1);
+    var arr = getAssignableObject(path, path.length);
+
+    for (var _len = arguments.length, newItems = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+      newItems[_key - 2] = arguments[_key];
+    }
+
+    arr.splice.apply(arr, [key, len].concat(newItems));
   }
 }
 
