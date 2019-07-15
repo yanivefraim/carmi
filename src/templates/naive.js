@@ -1,9 +1,11 @@
 function base() {
+  function _typeof(obj) { if (_typeof(Symbol) === "function" && _typeof(Symbol).iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
   function $NAME($model, $funcLibRaw, $batchingStrategy) {
     var $funcLib = $funcLibRaw
 
     if ($DEBUG_MODE) {
-    $funcLib = (!$funcLibRaw || typeof Proxy === 'undefined') ? $funcLibRaw : new Proxy($funcLibRaw, {
+    $funcLib = (!$funcLibRaw || _typeof(Proxy) === 'undefined') ? $funcLibRaw : new Proxy($funcLibRaw, {
       get: function(target, functionName) {
         if (target[functionName]) {
           return target[functionName]
@@ -14,7 +16,7 @@ function base() {
 
   function mathFunction(name, source) {
     return function(arg) {
-      var type = typeof arg
+      var type = _typeof(arg)
       if (type !== 'number') {
         throw new TypeError("Trying to call ".concat(JSON.stringify(arg), ".").concat(name, ". Expects number, received ").concat(type, " at ").concat(source));
       }
@@ -26,14 +28,14 @@ function base() {
   function checkTypes(input, name, types, functionName, source) {
     function checkType(type) {
       var isArray = Array.isArray(input)
-      return type == 'array' && isArray || (type === typeof input && !isArray)
+      return type == 'array' && isArray || (type === _typeof(input) && !isArray)
     }
 
     if (types.some(checkType)) {
       return
     }
 
-    var asString = typeof input === 'object' ? JSON.stringify(input) : input
+    var asString = _typeof(input) === 'object' ? JSON.stringify(input) : input
 
     throw new TypeError(`${functionName} expects ${types.join('/')}. ${name} at ${source}: ${asString}.${functionName}`)
   }
@@ -75,7 +77,7 @@ function base() {
       if (assignable[lastObjectKey]) {
         return
       }
-      var lastType = typeof path[path.length - 1]
+      var lastType = _typeof(path)[path.length - 1]
       assignable[lastObjectKey] = lastType === 'number' ? [] : {}
     }
 
@@ -90,7 +92,7 @@ function base() {
     }
 
     function applySetter(object, key, value) {
-      if (typeof value === 'undefined') {
+      if (_typeof(value) === 'undefined') {
         delete object[key]
       } else {
         object[key] = value;
