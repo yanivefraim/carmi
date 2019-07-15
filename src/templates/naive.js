@@ -8,8 +8,7 @@ function base() {
         if (target[functionName]) {
           return target[functionName]
         }
-
-        throw new TypeError(`Trying to call undefined function: ${functionName} `)
+        throw new TypeError("Trying to call undefined function: ".concat(functionName, " "));
     }})
   }
 
@@ -17,7 +16,7 @@ function base() {
     return function(arg) {
       var type = typeof arg
       if (type !== 'number') {
-        throw new TypeError(`Trying to call ${JSON.stringify(arg)}.${name}. Expects number, received ${type} at ${source}`)
+        throw new TypeError("Trying to call ".concat(JSON.stringify(arg), ".").concat(name, ". Expects number, received ").concat(type, " at ").concat(source));
       }
 
       return Math[name](arg)
