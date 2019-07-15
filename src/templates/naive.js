@@ -113,7 +113,7 @@ function base() {
         args[_key - 1] = arguments[_key];
       }
       if ($inBatch || $inRecalculate || $batchingStrategy) {
-        $batchPending.push({ func: func, args: args });
+        $batchPending.push({ func, args });
         if ((!$inBatch && !$inRecalculate) && $batchingStrategy) {
           $inBatch = true;
           $batchingStrategy.call($res);
@@ -134,9 +134,7 @@ function base() {
         $endBatch: function() {
           $inBatch = false;
           if ($batchPending.length) {
-            $batchPending.forEach(function (_ref) {
-              var func = _ref.func,
-              args = _ref.args;
+            $batchPending.forEach(function ({ func, args }) {
               func.apply($res, args);
             });
             $batchPending = [];
