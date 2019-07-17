@@ -1325,7 +1325,7 @@ function updateDerived() {
   var builderFunctions = [/*BUILDER_FUNCS*/];
   var builderNames = [/*BUILDER_NAMES*/];
   function updateDerived() {
-    for (let i = 0; i < $COUNT_GETTERS; i++) {
+    for (var i = 0; i < $COUNT_GETTERS; i++) {
       if ($first || $invalidatedRoots.has(i)) {
         var newValue = builderFunctions[i]([$invalidatedRoots, i]);
         setOnArray($topLevel, i, newValue, $first);
@@ -1341,14 +1341,14 @@ function updateDerived() {
 }
 
 module.exports = {
-  base,
-  library,
-  topLevel,
-  updateDerived,
+  base: base,
+  library: library,
+  topLevel: topLevel,
+  updateDerived: updateDerived,
   recursiveMap: recursiveFunc,
   recursiveMapValues: recursiveFunc,
-  helperFunc,
-  object,
-  array,
-  func
+  helperFunc: helperFunc,
+  object: object,
+  array: array,
+  func: func
 };
