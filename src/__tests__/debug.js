@@ -151,7 +151,7 @@ describe('Tests for usability and debugging carmi', () => {
       const optModel = evalOrLoad(src)
       const initialData = {list: [1, 2, 3, 4]}
 
-      expect(() => optModel(initialData)).toThrow('values expects object. valued at')
+      expect(() => optModel(initialData)).toThrow('values expectsobject. valued at')
     })
 
     it('when using objects with array functions, throw an error', () => {
