@@ -35,7 +35,7 @@ function base() {
     }
 
     var asString = typeof input === 'object' ? JSON.stringify(input) : input
-    throw new TypeError("".concat(functionName, " expects").concat(types.join('/'), ". ").concat(name, " at ").concat(source, ": ").concat(asString, ".").concat(functionName))
+    throw new TypeError("".concat(functionName, " expects ").concat(types.join('/'), ". ").concat(name, " at ").concat(source, ": ").concat(asString, ".").concat(functionName))
   }
 
   var $res = { $model };
