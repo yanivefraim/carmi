@@ -35,8 +35,7 @@ function base() {
     }
 
     var asString = typeof input === 'object' ? JSON.stringify(input) : input
-
-    throw new TypeError(`${functionName} expects ${types.join('/')}. ${name} at ${source}: ${asString}.${functionName}`)
+    throw new TypeError("".concat(functionName, " expects").concat(types.join('/'), ". ").concat(name, " at ").concat(source, ": ").concat(asString, ".").concat(functionName)
   }
 
   var $res = { $model };
@@ -364,4 +363,4 @@ function library() {
   }
 }
 
-module.exports = { base, library, func, topLevel, helperFunc, recursiveMapValues, recursiveMap };
+module.exports = { base: base, library: library, func: func, topLevel: topLevel, helperFunc: helperFunc, recursiveMapValues: recursiveMapValues, recursiveMap: recursiveMap };
